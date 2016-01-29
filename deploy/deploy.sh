@@ -11,6 +11,7 @@ then
 fi
 
 
+echo "Make sure you have sudo permission of online hosts"
 echo "Enter your password of online hosts: "
 read -s password
 sshCmd="sshpass -p $password ssh -o StrictHostKeyChecking=no"
@@ -25,7 +26,7 @@ then
 fi
 mkdir -p $deployTmpDir
 
-binName=gpvm
+binName=andals-gpm
 cd $deployTmpDir
 go build -o $binName $prjHome/main/main.go
 
