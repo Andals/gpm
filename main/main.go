@@ -34,7 +34,7 @@ func main() {
 	prjHome, _ := os.Getwd()
 
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: gpm install")
+		fmt.Println("Usage: andals-gpm install")
 		return
 	}
 
