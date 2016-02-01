@@ -1,3 +1,10 @@
+/**
+* @file main.go
+* @brief andals-gpm main
+* @author ligang
+* @date 2016-02-01
+ */
+
 package main
 
 import (
@@ -81,7 +88,7 @@ func install(prjHome string) {
 		if repoConf.tag != "" {
 			cmd += "git checkout " + repoConf.tag + " -b " + repoConf.tag + ";"
 		}
-		cmd += "rm -rf .git"
+		cmd += "rm -rf .git; 2>&1"
 
 		shell.RunCmd(cmd)
 
@@ -98,12 +105,24 @@ func parseRepositoryConf(repository string) *repositoryConf {
 	schemePos := strings.Index(repository, SEP_SCHEME)
 	conf.scheme = string(repoRune[0:schemePos])
 
+	url := ""
 	tagPos := strings.LastIndex(repository, SEP_TAG)
 	if tagPos != -1 {
 		conf.tag = string(repoRune[tagPos+1:])
-		conf.url = string(repoRune[schemePos+len(SEP_SCHEME) : tagPos])
+		url = string(repoRune[schemePos+len(SEP_SCHEME) : tagPos])
 	} else {
-		conf.url = string(repoRune[schemePos+2:])
+		url = string(repoRune[schemePos+2:])
+	}
+
+	switch conf.scheme {
+	case "git+https:":
+		conf.url = "https://" + url
+	case "git+http:":
+		conf.url = "http://" + url
+	case "git:":
+		conf.url = "git://" + url
+	default:
+		conf.url = url
 	}
 
 	return conf
