@@ -8,18 +8,16 @@
 package main
 
 import (
+	"andals/gobox/log"
+	logWriter "andals/gobox/log/writer"
 	"flag"
 	"fmt"
+	"gpm/conf"
 	"gpm/pkg/commands"
 	"os"
 )
 
-var debugMode bool
-
 func main() {
-	flag.BoolVar(&debugMode, "debug", false, "")
-	flag.Parse()
-
 	if flag.NArg() < 1 {
 		fmt.Println("Usage: andals-gpm install")
 		return
@@ -31,6 +29,9 @@ func main() {
 		return
 	}
 
+	writer, _ := logWriter.NewFileWriter(conf.GetLogPath())
+	logger, _ := log.NewSimpleLogger(writer, conf.GetLogLevel())
+
 	prjHome, _ := os.Getwd()
-	cmd.Run(prjHome)
+	cmd.Run(prjHome, logger)
 }

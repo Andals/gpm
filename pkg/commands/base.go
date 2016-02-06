@@ -10,6 +10,7 @@ package commands
 
 import (
 	"andals/gobox/error"
+	"andals/gobox/log"
 	"gpm/pkg/errno"
 )
 
@@ -18,7 +19,7 @@ const (
 )
 
 type ICommand interface {
-	Run(prjHome string) *error.Error
+	Run(prjHome string, logger log.ILogger) *error.Error
 }
 
 func GetCommand(name string) (ICommand, *error.Error) {

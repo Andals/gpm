@@ -9,26 +9,35 @@ package commands
 
 import (
 	"andals/gobox/error"
+	"andals/gobox/log"
+	"andals/gobox/misc"
 	"andals/gobox/shell"
-	"fmt"
-	"gpm/pkg/conf"
+	"gpm/pkg/pconf"
 	"os"
 )
 
 type installCommand struct {
 }
 
-func (this *installCommand) Run(prjHome string) *error.Error {
-	pkgConf, err := conf.ParsePackageConf(prjHome)
+func (this *installCommand) Run(prjHome string, logger log.ILogger) *error.Error {
+	pkgConf, err := pconf.ParsePackageConf(prjHome)
 	if err != nil {
+		logger.Debug([]byte(err.GetMsg() + "\n"))
+
 		return err
 	}
 
-	os.RemoveAll(conf.GetVendorRoot(prjHome))
+	logger.Debug([]byte("Remove vender root\n"))
+	os.RemoveAll(pconf.GetVendorRoot(prjHome))
 
 	dependencies := pkgConf.GetDependencies()
 	for name, depConf := range dependencies {
-		fmt.Println("Start install " + name)
+		goSrcRoot := os.Getenv("GOPATH") + "/src"
+		if misc.DirExist(goSrcRoot + "/" + name) {
+			logger.Warning([]byte("There is " + name + " in go src root\n"))
+		}
+
+		logger.Info([]byte("Start install " + name + "\n"))
 
 		path := depConf.GetPath()
 		repConf := depConf.GetRepository()
@@ -49,12 +58,13 @@ func (this *installCommand) Run(prjHome string) *error.Error {
 		}
 		cmd += "rm -rf .git; 2>&1"
 
-		shell.RunCmd(cmd)
+		result := shell.RunCmd(cmd)
+		logger.Debug([]byte(result.Output))
 
 		command := new(installCommand)
-		command.Run(pkgPrjHome)
+		command.Run(pkgPrjHome, logger)
 
-		fmt.Println("End install " + name)
+		logger.Info([]byte("End install " + name + "\n"))
 	}
 
 	return nil

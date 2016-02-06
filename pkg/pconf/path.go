@@ -1,4 +1,11 @@
-package conf
+/**
+* @file dependencies.go
+* @brief package conf pkg path
+* @author ligang
+* @date 2016-02-06
+ */
+
+package pconf
 
 import (
 	"path/filepath"

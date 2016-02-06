@@ -1,12 +1,11 @@
 /**
 * @file const.go
-* @brief const for conf
+* @brief package conf
 * @author ligang
-* @version 1.0
-* @date 2016-02-01
+* @date 2016-02-06
  */
 
-package conf
+package pconf
 
 const (
 	PACKAGE_JSON = "package.json"
