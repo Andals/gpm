@@ -22,15 +22,10 @@ var confData serverConf
 
 func init() {
 	flag.IntVar(&confData.logLevel, "logLevel", log.LEVEL_INFO, "log level")
-	flag.StringVar(&confData.logPath, "logPath", "/dev/stdout", "log path")
 
 	flag.Parse()
 }
 
 func GetLogLevel() int {
 	return confData.logLevel
-}
-
-func GetLogPath() string {
-	return confData.logPath
 }

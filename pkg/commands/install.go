@@ -8,6 +8,7 @@
 package commands
 
 import (
+	"andals/gobox/color"
 	"andals/gobox/error"
 	"andals/gobox/log"
 	"andals/gobox/misc"
@@ -34,7 +35,7 @@ func (this *installCommand) Run(prjHome string, logger log.ILogger) *error.Error
 	for name, depConf := range dependencies {
 		goSrcRoot := os.Getenv("GOPATH") + "/src"
 		if misc.DirExist(goSrcRoot + "/" + name) {
-			logger.Warning([]byte("There is " + name + " in go src root\n"))
+			logger.Warning(color.Red([]byte("There is " + name + " in go src root\n")))
 		}
 
 		logger.Info([]byte("Start install " + name + "\n"))

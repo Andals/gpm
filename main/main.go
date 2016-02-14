@@ -29,7 +29,7 @@ func main() {
 		return
 	}
 
-	writer, _ := logWriter.NewFileWriter(conf.GetLogPath())
+	writer, _ := logWriter.NewFileWriter("/dev/stdout")
 	logger, _ := log.NewSimpleLogger(writer, conf.GetLogLevel())
 
 	prjHome, _ := os.Getwd()
