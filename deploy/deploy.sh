@@ -11,8 +11,8 @@ then
 fi
 
 echo "Make sure you have sshpass in PATH"
-
 echo "Make sure you have sudo permission of online hosts"
+
 echo "Enter username of online hosts: "
 read username
 echo "Enter password of online hosts: "
