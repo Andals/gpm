@@ -8,7 +8,12 @@
 package misc
 
 import (
+	"andals/gobox/color"
+	"bytes"
+	"crypto/md5"
+	"fmt"
 	"os"
+	"runtime"
 )
 
 func IntSliceUnique(s []int) []int {
@@ -60,4 +65,25 @@ func DirExist(path string) bool {
 		return true
 	}
 	return false
+}
+
+func Md5(data []byte) string {
+	return fmt.Sprintf("%x", md5.Sum(data))
+}
+
+func PrintCallerFuncNameForTest() {
+	pc, _, _, _ := runtime.Caller(1)
+	f := runtime.FuncForPC(pc)
+
+	c := color.Yellow([]byte(f.Name()))
+	fmt.Println(string(c))
+}
+
+func AppendBytes(b []byte, elems ...[]byte) []byte {
+	buf := bytes.NewBuffer(b)
+	for _, e := range elems {
+		buf.Write(e)
+	}
+
+	return buf.Bytes()
 }

@@ -5,6 +5,7 @@ import (
 	logWriter "andals/gobox/log/writer"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestSimpleLogger(t *testing.T) {
@@ -14,7 +15,7 @@ func TestSimpleLogger(t *testing.T) {
 	writer := logWriter.NewBufferWriter(w, 1024)
 
 	logger, _ := NewSimpleLogger(writer, LEVEL_INFO)
-	msg := []byte("test simple logger\n")
+	msg := []byte("test simple logger")
 
 	testLogger(logger, msg)
 	logger.Free()
@@ -31,6 +32,8 @@ func TestAsyncLogger(t *testing.T) {
 	go asyncLogger2(wg)
 
 	wg.Wait()
+
+	time.Sleep(time.Second * 8)
 }
 
 func testLogger(logger ILogger, msg []byte) {
@@ -50,12 +53,14 @@ func asyncLogger1(wg *sync.WaitGroup) {
 	path := "/tmp/test_a1.log"
 
 	w, _ := logWriter.NewFileWriter(path)
-	writer := logWriter.NewBufferWriter(w, 1024)
+	writer, _ := logWriter.NewBufferWriterWithTimeFlush(w, 1024, time.Second*2)
 
 	l, _ := NewSimpleLogger(writer, LEVEL_INFO)
-	logger, _ := NewAsyncLogger("test_a1", l, 10)
-	msg := []byte("test async1 logger\n")
+	logger, _ := NewAsyncLogger(l, 10)
+	msg := []byte("test async1 logger")
 
+	testLogger(logger, msg)
+	time.Sleep(time.Second * 3)
 	testLogger(logger, msg)
 }
 
@@ -65,11 +70,11 @@ func asyncLogger2(wg *sync.WaitGroup) {
 	path := "/tmp/test_a2.log"
 
 	w, _ := logWriter.NewFileWriter(path)
-	writer := logWriter.NewBufferWriter(w, 1024)
+	writer, _ := logWriter.NewBufferWriterWithTimeFlush(w, 1024, time.Second*2)
 
 	l, _ := NewSimpleLogger(writer, LEVEL_INFO)
-	logger, _ := NewAsyncLogger("test_a2", l, 10)
-	msg := []byte("test async2 logger\n")
+	logger, _ := NewAsyncLogger(l, 10)
+	msg := []byte("test async2 logger")
 
 	testLogger(logger, msg)
 }

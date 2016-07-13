@@ -6,6 +6,8 @@ import (
 )
 
 func TestIntSliceUnique(t *testing.T) {
+	PrintCallerFuncNameForTest()
+
 	s := []int{1, 2, 2, 3, 3, 3, 4, 4, 4, 4}
 
 	fmt.Println("origin slice is: ", s)
@@ -16,6 +18,8 @@ func TestIntSliceUnique(t *testing.T) {
 }
 
 func TestStringSliceUnique(t *testing.T) {
+	PrintCallerFuncNameForTest()
+
 	s := []string{"a", "ab", "ab", "abc", "abc", "abc", "abcd", "abcd", "abcd", "abcd", "abcd"}
 
 	fmt.Println("origin slice is: ", s)
@@ -26,6 +30,8 @@ func TestStringSliceUnique(t *testing.T) {
 }
 
 func TestFileExist(t *testing.T) {
+	PrintCallerFuncNameForTest()
+
 	f := "/etc/passwd"
 
 	r := FileExist(f)
@@ -37,6 +43,8 @@ func TestFileExist(t *testing.T) {
 }
 
 func TestDirExist(t *testing.T) {
+	PrintCallerFuncNameForTest()
+
 	d := "/home/ligang/devspace"
 
 	r := DirExist(d)
@@ -45,4 +53,21 @@ func TestDirExist(t *testing.T) {
 	} else {
 		fmt.Println(d, "is not exist")
 	}
+}
+
+func TestMd5(t *testing.T) {
+	PrintCallerFuncNameForTest()
+
+	md5Str := Md5([]byte("abc"))
+
+	fmt.Println(md5Str)
+}
+
+func TestAppendBytes(t *testing.T) {
+	PrintCallerFuncNameForTest()
+
+	b := []byte("abc")
+	b = AppendBytes(b, []byte("def"), []byte("ghi"))
+
+	fmt.Println(string(b))
 }

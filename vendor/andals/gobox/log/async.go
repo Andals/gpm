@@ -7,72 +7,57 @@
 
 package log
 
-import (
-	"errors"
-	"sync"
-)
-
-const (
-	ST_FLUSH = 1
-	ST_FREE  = 2
-)
-
 type asyncMsg struct {
 	level int
 	msg   []byte
 }
 
 type asyncLogger struct {
-	key   string
-	msgCh chan *asyncMsg
-	stCh  chan int
-	wg    *sync.WaitGroup
+	msgCh   chan *asyncMsg
+	flushCh chan int
+	freeCh  chan int
 
-	*simpleLogger
+	ILogger
 }
 
-// prevent asyncLoggerContainer race
-var acch chan int
-var asyncLoggerContainer map[string]*asyncLogger
+type asyncLoggerList struct {
+	// prevent asyncLoggerList race
+	lockCh chan int
+
+	loggers []*asyncLogger
+}
+
+var allist asyncLoggerList
 
 func init() {
-	asyncLoggerContainer = make(map[string]*asyncLogger)
-
-	acch = make(chan int, 1)
-	acch <- 1
+	allist.lockCh = make(chan int, 1)
+	allist.lockCh <- 1
 }
 
-func NewAsyncLogger(key string, logger *simpleLogger, queueLen int) (*asyncLogger, error) {
+func NewAsyncLogger(logger ILogger, queueLen int) (*asyncLogger, error) {
 	defer func() {
-		acch <- 1
+		allist.lockCh <- 1
 	}()
 
-	<-acch
-
-	_, ok := asyncLoggerContainer[key]
-	if ok {
-		return nil, errors.New("key exists")
-	}
+	<-allist.lockCh
 
 	this := &asyncLogger{
-		key:   key,
-		msgCh: make(chan *asyncMsg, queueLen),
-		stCh:  make(chan int),
-		wg:    new(sync.WaitGroup),
+		msgCh:   make(chan *asyncMsg, queueLen),
+		flushCh: make(chan int),
+		freeCh:  make(chan int),
 
-		simpleLogger: logger,
+		ILogger: logger,
 	}
 
-	this.wg.Add(1)
 	go this.logRoutine()
 
-	asyncLoggerContainer[key] = this
+	allist.loggers = append(allist.loggers, this)
 
 	return this, nil
 }
 
 func FreeAllAsyncLogger() {
-	for _, logger := range asyncLoggerContainer {
+	for _, logger := range allist.loggers {
 		logger.Free()
 	}
 }
@@ -89,36 +74,37 @@ func (this *asyncLogger) Log(level int, msg []byte) error {
 }
 
 func (this *asyncLogger) Flush() error {
-	this.stCh <- ST_FLUSH
+	this.flushCh <- 1
 
 	return nil
 }
 
 func (this *asyncLogger) Free() {
-	this.stCh <- ST_FREE
+	defer func() {
+		<-this.freeCh
+	}()
 
-	this.wg.Wait()
+	this.freeCh <- 1
 }
 
 func (this *asyncLogger) logRoutine() {
-	defer this.wg.Done()
+	defer func() {
+		this.freeCh <- 1
+	}()
 
 	for {
 		select {
 		case am, _ := <-this.msgCh:
-			this.simpleLogger.Log(am.level, am.msg)
-		case st, _ := <-this.stCh:
-			switch st {
-			case ST_FLUSH:
-				this.simpleLogger.Flush()
-			case ST_FREE:
-				for 0 != len(this.msgCh) {
-					am, _ := <-this.msgCh
-					this.simpleLogger.Log(am.level, am.msg)
-				}
-				this.simpleLogger.Free()
-				return
+			this.ILogger.Log(am.level, am.msg)
+		case <-this.flushCh:
+			this.ILogger.Flush()
+		case <-this.freeCh:
+			for 0 != len(this.msgCh) {
+				am, _ := <-this.msgCh
+				this.ILogger.Log(am.level, am.msg)
 			}
+			this.ILogger.Free()
+			return
 		}
 	}
 }
