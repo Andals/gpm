@@ -9,7 +9,7 @@ package commands
 
 import (
 	"andals/gobox/color"
-	"andals/gobox/error"
+	"andals/gobox/exception"
 	"andals/gobox/log"
 	"andals/gobox/misc"
 	"andals/gobox/shell"
@@ -20,10 +20,10 @@ import (
 type installCommand struct {
 }
 
-func (this *installCommand) Run(prjHome string, logger log.ILogger) *error.Error {
+func (this *installCommand) Run(prjHome string, logger log.ILogger) *exception.Exception {
 	pkgConf, err := pconf.ParsePackageConf(prjHome)
 	if err != nil {
-		logger.Debug([]byte(err.GetMsg() + "\n"))
+		logger.Debug([]byte(err.Msg() + "\n"))
 
 		return err
 	}

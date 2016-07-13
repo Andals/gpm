@@ -9,7 +9,7 @@
 package commands
 
 import (
-	"andals/gobox/error"
+	"andals/gobox/exception"
 	"andals/gobox/log"
 	"gpm/pkg/errno"
 )
@@ -19,14 +19,14 @@ const (
 )
 
 type ICommand interface {
-	Run(prjHome string, logger log.ILogger) *error.Error
+	Run(prjHome string, logger log.ILogger) *exception.Exception
 }
 
-func GetCommand(name string) (ICommand, *error.Error) {
+func GetCommand(name string) (ICommand, *exception.Exception) {
 	switch name {
 	case COMMAND_NAME_INSTALL:
 		return new(installCommand), nil
 	default:
-		return nil, error.NewError(errno.E_COMMAND_INVALID_NAME, "invalid command name")
+		return nil, exception.New(errno.E_COMMAND_INVALID_NAME, "invalid command name")
 	}
 }

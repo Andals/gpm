@@ -8,7 +8,7 @@
 package pconf
 
 import (
-	"andals/gobox/error"
+	"andals/gobox/exception"
 	"gpm/pkg/errno"
 	"strings"
 )
@@ -19,13 +19,13 @@ type RepositoryConf struct {
 	tag    string
 }
 
-func parseRepositoryConf(repStr string) (*RepositoryConf, *error.Error) {
+func parseRepositoryConf(repStr string) (*RepositoryConf, *exception.Exception) {
 	repConf := new(RepositoryConf)
 	repoRune := []rune(repStr)
 
 	schemePos := strings.Index(repStr, SEP_SCHEME)
 	if schemePos == -1 {
-		return nil, error.NewError(errno.E_CONF_REPOSITORY_STR_ERROR, "invalid repository str: don't have scheme pos")
+		return nil, exception.New(errno.E_CONF_REPOSITORY_STR_ERROR, "invalid repository str: don't have scheme pos")
 	}
 	repConf.scheme = string(repoRune[0:schemePos])
 
@@ -48,7 +48,7 @@ func parseRepositoryConf(repStr string) (*RepositoryConf, *error.Error) {
 	case "git:":
 		repConf.url = "git://" + url
 	default:
-		return nil, error.NewError(errno.E_CONF_REPOSITORY_STR_ERROR, "invalid repository str: undefined scheme")
+		return nil, exception.New(errno.E_CONF_REPOSITORY_STR_ERROR, "invalid repository str: undefined scheme")
 	}
 
 	return repConf, nil

@@ -8,7 +8,7 @@
 package pconf
 
 import (
-	"andals/gobox/error"
+	"andals/gobox/exception"
 )
 
 type DependConf struct {
@@ -24,7 +24,7 @@ func (this *DependConf) GetRepository() *RepositoryConf {
 	return this.repository
 }
 
-func parseDependConf(prjHome string, pkgName string, repStr string) (*DependConf, *error.Error) {
+func parseDependConf(prjHome string, pkgName string, repStr string) (*DependConf, *exception.Exception) {
 	repository, err := parseRepositoryConf(repStr)
 	if err != nil {
 		return nil, err

@@ -8,7 +8,7 @@
 package pconf
 
 import (
-	"andals/gobox/error"
+	"andals/gobox/exception"
 	"andals/gobox/misc"
 	"encoding/json"
 	"fmt"
@@ -26,10 +26,10 @@ type PackageConf struct {
 	dependencies map[string]*DependConf
 }
 
-func ParsePackageConf(prjHome string) (*PackageConf, *error.Error) {
+func ParsePackageConf(prjHome string) (*PackageConf, *exception.Exception) {
 	confPath := getPackageJsonPath(prjHome)
 	if !misc.FileExist(confPath) {
-		return nil, error.NewError(errno.E_CONF_PACKAGE_JSON_NOT_EXISTS, "There is no "+PACKAGE_JSON+" in "+prjHome)
+		return nil, exception.New(errno.E_CONF_PACKAGE_JSON_NOT_EXISTS, "There is no "+PACKAGE_JSON+" in "+prjHome)
 	}
 
 	var pkgJson packageJson
@@ -37,7 +37,7 @@ func ParsePackageConf(prjHome string) (*PackageConf, *error.Error) {
 	jsonStr, _ := ioutil.ReadFile(confPath)
 	err := json.Unmarshal(jsonStr, &pkgJson)
 	if nil != err {
-		return nil, error.NewError(errno.E_CONF_PACKAGE_JSON_PARSE_ERROR, "Parse "+PACKAGE_JSON+" error")
+		return nil, exception.New(errno.E_CONF_PACKAGE_JSON_PARSE_ERROR, "Parse "+PACKAGE_JSON+" error")
 	}
 
 	return parseByJson(prjHome, &pkgJson)
@@ -55,11 +55,11 @@ func (this *PackageConf) GetDependencies() map[string]*DependConf {
 	return this.dependencies
 }
 
-func parseByJson(prjHome string, pkgJson *packageJson) (*PackageConf, *error.Error) {
+func parseByJson(prjHome string, pkgJson *packageJson) (*PackageConf, *exception.Exception) {
 	pkgConf := new(PackageConf)
 
 	if pkgJson.Name == "" {
-		return nil, error.NewError(errno.E_CONF_PACKAGE_NAME_ERROR, "Parse package name error")
+		return nil, exception.New(errno.E_CONF_PACKAGE_NAME_ERROR, "Parse package name error")
 	}
 
 	pkgConf.name = pkgJson.Name
