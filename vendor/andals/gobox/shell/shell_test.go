@@ -16,9 +16,9 @@ func TestRunAsUser(t *testing.T) {
 }
 
 func TestRsync(t *testing.T) {
-	host := "10.16.57.92"
-	sou := "/home/ligang/tmp/go/*"
-	dst := "/home/ligang/tmp/go"
+	host := "127.0.0.1"
+	sou := "/tmp/go/*"
+	dst := "/tmp/go1"
 	sshUser := "ligang"
 
 	result := Rsync(host, sou, dst, "", sshUser, 3)
